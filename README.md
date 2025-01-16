@@ -7,6 +7,7 @@
     - [Features](#features)
     - [Usage](#usage)
     - [Example](#example)
+        - [Example Specification](#example-specification)
         - [Example Conversion and Size Comparison](#example-conversion-and-size-comparison)
         - [Example YAML Input](#example-yaml-input)
         - [Example Expanded YAML](#example-expanded-yaml)
@@ -35,6 +36,7 @@ The script [index-yaml-json-sparql.pl](index-yaml-json-sparql.pl) implements the
 - Converts alternative paths spelled with `|` to suffixed property definitions
   (`prop$1, prop$2, prop$3 ...`)
   and copies all characteristics from the original property
+- Supports objects nested up to 5 levels (see [Example](#example))
 - Converts to JSON and wraps it in a SPARQL Update
 - Replaces `elasticsearchBasicAuthPassword: $secret` with the value of `--secret=...`
 - Replaces index instance name with the value of `--index=...`
@@ -64,7 +66,6 @@ Notes:
 ## Example
 
 Let's look at an example from the EU [UNDERPIN project](https://underpinproject.eu/).
-We want to index the following fields. Notes:
 - `*` are multivalued fields.
 - Fields are defined using prefixed RDF properties, and some use [SPARQL Property Paths](https://www.w3.org/TR/sparql11-query/#propertypaths)
   - All property paths start from `dcat:Dataset`
@@ -74,7 +75,8 @@ We want to index the following fields. Notes:
 - Some fields reuse already defined fields (eg `keywords` uses RDF prop `dcat:keyword` and then reuses `tag, types` etc etc.
   Unfortunately [Copy fields](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#copy-fields) can only reuse "**single element** in the property chain" so we can't use it with complex paths.
 
-Here are the fields:
+### Example Specification
+We want to index the following fields.
 - Facets:
   - `publisher`: `dct:publisher/schema:name`
   - `types`: `dct:type/skos:prefLabel`*
@@ -201,9 +203,11 @@ fields:
   - Sequence paths are separated with `/`
   - No need to worry whether there's 1 or multiple props in the path
   - Alternative paths are listed on lines separated with `|`
-- Unfortunately you cannot use [Copy fields](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#copy-fields) (`@field` references)
-  because they support only single-valued property chains (i.e. a simple copy of an existing field).
-  (The script does supports the `@field` notation)
+  - Unfortunately we cannot use [Copy fields](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#copy-fields) (`@field` references) in this example
+    because they support only single-valued property chains (i.e. a simple copy of an existing field).
+    (The script does supports the `@field` notation)
+- [Nested objects](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#nested-objects) are supported (in this case `column` with `datatype: native:nested`).
+  These are important if you need to track the correlation between nested fields
 
 ### Example Expanded YAML
 
