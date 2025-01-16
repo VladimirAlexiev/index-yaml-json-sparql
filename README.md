@@ -195,15 +195,19 @@ fields:
       analyzed: false
 ```
 
-`propertyChain` is the most complex field (note: it is just a large text field with newlines removed due to the `>-` marker).
-- Alternatives are listed on separate lines separated with `|`.
-- Unfortunately we cannot use [Copy fields](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#copy-fields) (`@field` references) 
+- You can use comments
+- `propertyChain` is the most complex field (note: it is just a large text field with newlines removed due to the `>-` marker).
+  - Use prefixed RDF prop names
+  - Sequence paths are separated with `/`
+  - No need to worry whether there's 1 or multiple props in the path
+  - Alternative paths are listed on lines separated with `|`
+- Unfortunately you cannot use [Copy fields](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#copy-fields) (`@field` references)
   because they support only single-valued property chains (i.e. a simple copy of an existing field).
   (The script does supports the `@field` notation)
 
 ### Example Expanded YAML
 
-Now let's look at a small piece of [elastic-index-expanded.yaml](elastic-index-expanded.yaml) 
+Now let's look at a small piece of [elastic-index-expanded.yaml](elastic-index-expanded.yaml)
 that corresponds to the `fieldName: keywords` above:
 ```yaml
 - fieldName: keywords$1
