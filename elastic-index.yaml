@@ -1,0 +1,74 @@
+elasticsearchNode: https://elastic.dataspace.underpinproject.eu
+elasticsearchBasicAuthUser: write
+elasticsearchBasicAuthPassword: $secret
+
+types: [dcat:Dataset]
+fields:
+  - fieldName: id
+    propertyChain: dct:identifier
+    analyzed: false # keyword
+  - fieldName: title
+    propertyChain: dct:title
+    analyzed: true
+  - fieldName: publisher
+    propertyChain: dct:publisher/schema:name
+    analyzed: false
+  - fieldName: types
+    propertyChain: dct:type/skos:prefLabel
+    array: true # multiple values
+    analyzed: false
+  - fieldName: startDate
+    propertyChain: dct:temporal/dcat:startDate
+    analyzed: false
+  - fieldName: endDate
+    propertyChain: dct:temporal/dcat:endDate
+    analyzed: false
+  - fieldName: tag
+    propertyChain: dct:spatial
+    analyzed: false
+  - fieldName: schema
+    propertyChain: dct:conformsTo/dct:title
+    analyzed: false
+  - fieldName: text
+    propertyChain: >-     
+      dct:identifier |
+      dct:title |
+      dct:publisher/schema:name |
+      dct:type/skos:prefLabel |
+      dct:temporal/dcat:startDate |
+      dct:temporal/dcat:endDate |
+      dct:spatial |
+      dct:conformsTo/dct:title |
+      dct:conformsTo/csvw:column/dct:title
+    analyzed: true
+  - fieldName: keywords
+    propertyChain: >-
+      dcat:keyword |
+      dct:type/skos:prefLabel |
+      dct:spatial |
+      dct:conformsTo/csvw:column/sosa:hasFeatureOfInterest/skos:prefLabel |
+      dct:conformsTo/csvw:column/un:qualifier/skos:prefLabel |
+      dct:conformsTo/csvw:column/qudt:hasQuantityKind/skos:prefLabel |
+      dct:conformsTo/csvw:column/qudt:hasUnit/skos:prefLabel
+    array: true
+    analyzed: false
+  - fieldName: column
+    propertyChain: dct:conformsTo/csvw:column
+    array: true
+    datatype: native:nested
+    objectFields:
+    - fieldName: features
+      propertyChain: sosa:hasFeatureOfInterest/skos:prefLabel
+      array: true
+      analyzed: false
+    - fieldName: qualifiers
+      propertyChain: un:qualifier/skos:prefLabel
+      array: true
+      analyzed: false
+    - fieldName: quantity
+      propertyChain: qudt:hasQuantityKind/skos:prefLabel
+      analyzed: false
+    - fieldName: unit
+      propertyChain: qudt:hasUnit/skos:prefLabel
+      analyzed: false
+
