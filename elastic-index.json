@@ -1,7 +1,7 @@
 {
    "elasticsearchBasicAuthPassword" : "$secret",
-   "elasticsearchBasicAuthUser" : "write",
-   "elasticsearchNode" : "https://elastic.dataspace.underpinproject.eu",
+   "elasticsearchBasicAuthUser" : "elastic",
+   "elasticsearchNode" : "elastic:9200",
    "fields" : [
       {
          "analyzed" : false,
@@ -251,6 +251,6 @@
       }
    ],
    "types" : [
-      "dcat:Dataset"
+      "http://www.w3.org/ns/dcat#Dataset"
    ]
 }

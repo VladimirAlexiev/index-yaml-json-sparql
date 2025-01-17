@@ -45,10 +45,14 @@ our $prefix_re = "(".join("|",keys(%prefix))."):";
 my $yaml = YAML::PP->new
   (schema   => ['JSON'], # only allow true/false as boolean values
    header   => 0, # don't print "---" at start
-   preserve => PRESERVE_ORDER, # order of hash keys
+   # preserve => PRESERVE_ORDER, # order of hash keys: unfortunately there's no way to sort them
 );
 my $obj = $yaml->load_string($input) or die "$!\n";
+
+my @types = map {replacePrefixes($_,"types $obj->{types}")} split(/[, ]+/, $obj->{types});
+$obj->{types} = [@types];
 processFields($obj->{fields}) if exists $obj->{fields};
+
 $opt_dump and print Dumper($obj) and exit;
 $opt_yaml and print $yaml->dump_string($obj) and exit;
 
@@ -67,6 +71,16 @@ $output
 SPARQL
 print $sparql;
 
+sub replacePrefixes {
+  my $var = shift;
+  my $context = shift;
+  $var =~ s{$prefix_re}{
+    exists $prefix{$1} or die "Prefix $1 is undefined but is used in $context\n";
+    $prefix{$1}
+  }e;
+  $var
+}
+
 sub processFields {
   my $fields = shift;
   my @extraFields;
@@ -76,13 +90,7 @@ sub processFields {
     my @alternatives = split(/ *\| */,$propertyChain);
     my $n = $#alternatives ? 1 : undef; # if more than 1, we need to split name to name$1, name$2 ...
     foreach my $chain (@alternatives) {
-      my @chain = split (/ *\/ */, $chain);
-      map {
-        s{$prefix_re}{
-          exists $prefix{$1} or die "Prefix $1 used in propertyChain $propertyChain is undefined\n";
-          $prefix{$1}
-        }ge;
-      } @chain;
+      my @chain = map {replacePrefixes($_, "propertyChain $propertyChain")} split (/ *\/ */, $chain);
       my $prop_new;
       if ($n && $n>1) { # make a copy (since all characteristics must be the same) and save it as an "extra field"
         $prop_new = {%$prop};

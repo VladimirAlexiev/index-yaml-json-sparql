@@ -1,8 +1,8 @@
-elasticsearchNode: https://elastic.dataspace.underpinproject.eu
-elasticsearchBasicAuthUser: write
+elasticsearchNode: elastic:9200
+elasticsearchBasicAuthUser: elastic
 elasticsearchBasicAuthPassword: $secret
 
-types: [dcat:Dataset]
+types: dcat:Dataset
 fields:
   - fieldName: id
     propertyChain: dct:identifier

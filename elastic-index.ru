@@ -4,8 +4,8 @@ INSERT DATA {
   elastic-inst:datasets elastic:createConnector '''
 {
    "elasticsearchBasicAuthPassword" : "$secret",
-   "elasticsearchBasicAuthUser" : "write",
-   "elasticsearchNode" : "https://elastic.dataspace.underpinproject.eu",
+   "elasticsearchBasicAuthUser" : "elastic",
+   "elasticsearchNode" : "elastic:9200",
    "fields" : [
       {
          "analyzed" : false,
@@ -255,7 +255,7 @@ INSERT DATA {
       }
    ],
    "types" : [
-      "dcat:Dataset"
+      "http://www.w3.org/ns/dcat#Dataset"
    ]
 }
 

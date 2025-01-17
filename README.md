@@ -32,11 +32,14 @@ The index definition is quite verbose:
 
 The script [index-yaml-json-sparql.pl](index-yaml-json-sparql.pl) implements the following features:
 - Expands prefixed RDF properties to full URLs using a file `prefixes.ttl`
-- Converts sequential paths spelled with `/` to JSON arrays of URLs
-- Converts alternative paths spelled with `|` to suffixed property definitions
-  (`prop$1, prop$2, prop$3 ...`)
-  and copies all characteristics from the original property
-- Supports objects nested up to 5 levels (see [Example](#example))
+- In `types`: should be a text field of prefixed RDF type URLss, separated by comma or space
+  - Wraps it in a JSON array
+- In `propertyChain`: should be a text field of prefixed property URLs, separated by `|` or `/`
+  - Converts sequential paths spelled with `/` to JSON arrays of URLs
+  - Converts alternative paths spelled with `|` to suffixed property definitions
+    (`prop$1, prop$2, prop$3 ...`)
+    and copies all characteristics from the original property
+  - Supports objects nested up to 5 levels (see [Example](#example))
 - Converts to JSON and wraps it in a SPARQL Update
 - Replaces `elasticsearchBasicAuthPassword: $secret` with the value of `--secret=...`
 - Replaces index instance name with the value of `--index=...`
@@ -122,11 +125,11 @@ Here is a visual comparison of YAML (first column) vs JSON (the next 3 columns):
 
 The input [elastic-index.yaml](elastic-index.yaml) looks like this:
 ```yaml
-elasticsearchNode: https://elastic.dataspace.underpinproject.eu
-elasticsearchBasicAuthUser: write
+elasticsearchNode: elastic:9200
+elasticsearchBasicAuthUser: elastic
 elasticsearchBasicAuthPassword: $secret
 
-types: [dcat:Dataset]
+types: dcat:Dataset
 fields:
   - fieldName: id
     propertyChain: dct:identifier
@@ -279,12 +282,12 @@ INSERT DATA {
   elastic-inst:datasets elastic:createConnector '''
 {
    "elasticsearchBasicAuthPassword" : "$secret",
-   "elasticsearchBasicAuthUser" : "write",
-   "elasticsearchNode" : "https://elastic.dataspace.underpinproject.eu",
+   "elasticsearchBasicAuthUser" : "elastic",
+   "elasticsearchNode" : "elastic:9200",
    "fields" : [
 ...
    ],
-   "types" : ["dcat:Dataset"]
+   "types" : ["http://www.w3.org/ns/dcat#Dataset"]
 }
 
 ''' .
