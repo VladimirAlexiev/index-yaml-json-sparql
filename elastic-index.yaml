@@ -19,10 +19,8 @@ fields:
     analyzed: false
   - fieldName: startDate
     propertyChain: dct:temporal/dcat:startDate
-    analyzed: false
   - fieldName: endDate
     propertyChain: dct:temporal/dcat:endDate
-    analyzed: false
   - fieldName: tag
     propertyChain: dct:spatial
     analyzed: false
@@ -39,8 +37,17 @@ fields:
       dct:temporal/dcat:endDate |
       dct:spatial |
       dct:conformsTo/dct:title |
-      dct:conformsTo/csvw:column/dct:title
+      dct:conformsTo/csvw:column/dct:title |
+      dcat:keyword
     analyzed: true
+  - fieldName: text_completion
+    propertyChain: "@text"
+    datatype: native:completion
+    analyze: true
+    nativeSettings:
+      preserve_separators: true
+      preserve_position_increments: true
+      max_input_length: 50    
   - fieldName: keywords
     propertyChain: >-
       dcat:keyword |

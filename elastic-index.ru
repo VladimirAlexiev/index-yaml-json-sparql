@@ -39,7 +39,6 @@ INSERT DATA {
          ]
       },
       {
-         "analyzed" : false,
          "fieldName" : "startDate",
          "propertyChain" : [
             "http://purl.org/dc/terms/temporal",
@@ -47,7 +46,6 @@ INSERT DATA {
          ]
       },
       {
-         "analyzed" : false,
          "fieldName" : "endDate",
          "propertyChain" : [
             "http://purl.org/dc/terms/temporal",
@@ -74,6 +72,19 @@ INSERT DATA {
          "fieldName" : "text$1",
          "propertyChain" : [
             "http://purl.org/dc/terms/identifier"
+         ]
+      },
+      {
+         "analyze" : true,
+         "datatype" : "native:completion",
+         "fieldName" : "text_completion",
+         "nativeSettings" : {
+            "max_input_length" : 50,
+            "preserve_position_increments" : true,
+            "preserve_separators" : true
+         },
+         "propertyChain" : [
+            "@text"
          ]
       },
       {
@@ -190,6 +201,13 @@ INSERT DATA {
             "http://purl.org/dc/terms/conformsTo",
             "http://www.w3.org/ns/csvw#column",
             "http://purl.org/dc/terms/title"
+         ]
+      },
+      {
+         "analyzed" : true,
+         "fieldName" : "text$10",
+         "propertyChain" : [
+            "http://www.w3.org/ns/dcat#keyword"
          ]
       },
       {

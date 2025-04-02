@@ -21,13 +21,11 @@ fields:
   propertyChain:
   - http://purl.org/dc/terms/type
   - http://www.w3.org/2004/02/skos/core#prefLabel
-- analyzed: false
-  fieldName: startDate
+- fieldName: startDate
   propertyChain:
   - http://purl.org/dc/terms/temporal
   - http://www.w3.org/ns/dcat#startDate
-- analyzed: false
-  fieldName: endDate
+- fieldName: endDate
   propertyChain:
   - http://purl.org/dc/terms/temporal
   - http://www.w3.org/ns/dcat#endDate
@@ -44,6 +42,15 @@ fields:
   fieldName: text$1
   propertyChain:
   - http://purl.org/dc/terms/identifier
+- analyze: true
+  datatype: native:completion
+  fieldName: text_completion
+  nativeSettings:
+    max_input_length: 50
+    preserve_position_increments: true
+    preserve_separators: true
+  propertyChain:
+  - '@text'
 - analyzed: false
   array: true
   fieldName: keywords$1
@@ -117,6 +124,10 @@ fields:
   - http://purl.org/dc/terms/conformsTo
   - http://www.w3.org/ns/csvw#column
   - http://purl.org/dc/terms/title
+- analyzed: true
+  fieldName: text$10
+  propertyChain:
+  - http://www.w3.org/ns/dcat#keyword
 - analyzed: false
   array: true
   fieldName: keywords$2
