@@ -12,6 +12,7 @@
         - [Example YAML Input](#example-yaml-input)
         - [Example Expanded YAML](#example-expanded-yaml)
         - [Example SPARQL Update](#example-sparql-update)
+    - [Example2](#example2)
     - [Caveats](#caveats)
     - [Prerequisites](#prerequisites)
 
@@ -32,7 +33,7 @@ The index definition is quite verbose:
 
 The script [index-yaml-json-sparql.pl](index-yaml-json-sparql.pl) implements the following features:
 - Expands prefixed RDF properties to full URLs using a file `prefixes.ttl`
-- In `types`: should be a text field of prefixed RDF type URLss, separated by comma or space
+- In `types`: should be a text field of prefixed RDF type URLs, separated by comma or space
   - Wraps it in a JSON array
 - In `propertyChain`: should be a text field of prefixed property URLs, separated by `|` or `/`
   - Converts sequential paths spelled with `/` to JSON arrays of URLs
@@ -41,8 +42,9 @@ The script [index-yaml-json-sparql.pl](index-yaml-json-sparql.pl) implements the
     and copies **all characteristics** from the original property.
     This single feature saves you a lot of work!
   - Supports objects nested up to 5 levels (see [Example](#example) below)
-  - Supports additional Elasticsearch connector features 
+  - Supports additional Elasticsearch connector features
     by using `datatype: native:*` and `nativeSettings` (see [Example](#example) below)
+- Supports all field characteristics, eg `valueFilter` (see [Example2](#example2) below)
 - Converts to JSON and wraps it in a SPARQL Update
 - Replaces `elasticsearchBasicAuthPassword: $secret` with the value of `--secret=...`
 - Replaces index instance name with the value of `--index=...`
@@ -79,7 +81,7 @@ Let's look at an example from the EU [UNDERPIN project](https://underpinproject.
   - Disjunction is shown as `|` and implemented as [Multiple property chains per field](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#elasticsearch-graphdb-connector-multiple-chains)
 - Elastic fields are in lowercase and don't use a prefix
 - Some fields reuse already defined fields (eg `keywords` uses RDF prop `dcat:keyword` and then reuses `tag, types` etc etc.
-  - [Copy fields](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#copy-fields) can reuse a "**single element** in the property chain" 
+  - [Copy fields](https://graphdb.ontotext.com/documentation/10.8/elasticsearch-graphdb-connector.html#copy-fields) can reuse a "**single element** in the property chain"
     (eg `text_completion` copies `text` by referring to it as `"@text"`)
   - It works only with whole fields but not with partial complex paths.
 
@@ -142,7 +144,7 @@ types: dcat:Dataset
 fields:
   - fieldName: id
     propertyChain: dct:identifier
-    analyzed: false # keyword
+    analyzed: false                       # this is a keyword
   - fieldName: title
     propertyChain: dct:title
     analyzed: true
@@ -151,7 +153,7 @@ fields:
     analyzed: false
   - fieldName: types
     propertyChain: dct:type/skos:prefLabel
-    array: true # multiple values
+    array: true                           # multiple values
     analyzed: false
   - fieldName: startDate
     propertyChain: dct:temporal/dcat:startDate
@@ -164,7 +166,7 @@ fields:
     propertyChain: dct:conformsTo/dct:title
     analyzed: false
   - fieldName: text
-    propertyChain: >-     
+    propertyChain: >-
       dct:identifier |
       dct:title |
       dct:publisher/schema:name |
@@ -183,7 +185,7 @@ fields:
     nativeSettings:
       preserve_separators: true
       preserve_position_increments: true
-      max_input_length: 50    
+      max_input_length: 50
   - fieldName: keywords
     propertyChain: >-
       dcat:keyword |
@@ -441,6 +443,28 @@ INSERT DATA {
 You should use the `--secret` and `--index` options to customize respectively:
 - `elasticsearchBasicAuthPassword` (assuming you use basic authentication from GraphDB to Elastic)
 - the index instance URL (in this case `elastic-inst:datasets`)
+
+## Example2
+Let's say you have a big class hierarchy of Assets (e.g. Air Handling Unit, Uninterruptible Power Supply, Truck, etc).
+- You want to index all of them. 
+  For that you should enable `rdfs:subClassOf` inference, so that `types` catches all subclasses
+- One of the important fields you want to capture is the type of asset.
+  But you want only the explicit (directly asserted) type, not all supertypes.
+  - The [RDF4J "direct hierarchy" vocabulary](https://graphdb.ontotext.com/documentation/11.2/query-behavior.html#how-to-use-rdf4j-direct-hierarchy-vocabulary) defines `sesame:directType` for this purpose.
+    But if you try `propertyChain: sesame:directType`, you get error "System entities may not be used as regular data".
+  - So we should use `rdf:type`, but with a `valueFilter` [filter operator](https://graphdb.ontotext.com/documentation/11.2/elasticsearch-graphdb-connector.html#filter-operators) `isExplicit` like this:
+```yaml
+types: ex:Asset
+fields:
+  - fieldName: type
+    propertyChain: rdf:type
+    valueFilter: isExplicit($this)
+    analyzed: false
+```
+
+This script doesn't know anything about `valueFilter` and its syntax: it just passes them along to JSON.
+- In this way you can use all features of GraphDB's Elastic connector
+- If you encounter any problem with the right side, enclosing it in `"..."` should fix it
 
 ## Caveats
 
