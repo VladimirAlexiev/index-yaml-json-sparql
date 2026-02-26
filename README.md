@@ -12,7 +12,8 @@
         - [Example YAML Input](#example-yaml-input)
         - [Example Expanded YAML](#example-expanded-yaml)
         - [Example SPARQL Update](#example-sparql-update)
-    - [Example2](#example2)
+    - [Example2 Filtering](#example2-filtering)
+    - [Example3 Inverse Path](#example3-inverse-path)
     - [Caveats](#caveats)
     - [Prerequisites](#prerequisites)
 
@@ -44,7 +45,8 @@ The script [index-yaml-json-sparql.pl](index-yaml-json-sparql.pl) implements the
   - Supports objects nested up to 5 levels (see [Example](#example) below)
   - Supports additional Elasticsearch connector features
     by using `datatype: native:*` and `nativeSettings` (see [Example](#example) below)
-- Supports all field characteristics, eg `valueFilter` (see [Example2](#example2) below)
+- Supports all field characteristics, eg `valueFilter` (see [Example2 Filtering](#example2-filtering) below)
+- Supports inverse property paths (see [Example3 Inverse Path](#example3-inverse-path) below)
 - Converts to JSON and wraps it in a SPARQL Update
 - Replaces `elasticsearchBasicAuthPassword: $secret` with the value of `--secret=...`
 - Replaces index instance name with the value of `--index=...`
@@ -444,7 +446,7 @@ You should use the `--secret` and `--index` options to customize respectively:
 - `elasticsearchBasicAuthPassword` (assuming you use basic authentication from GraphDB to Elastic)
 - the index instance URL (in this case `elastic-inst:datasets`)
 
-## Example2
+## Example2 Filtering
 Let's say you have a big class hierarchy of Assets (e.g. Air Handling Unit, Uninterruptible Power Supply, Truck, etc).
 - You want to index all of them. 
   For that you should enable `rdfs:subClassOf` inference, so that `types` catches all subclasses
@@ -465,6 +467,24 @@ fields:
 This script doesn't know anything about `valueFilter` and its syntax: it just passes them along to JSON.
 - In this way you can use all features of GraphDB's Elastic connector
 - If you encounter any problem with the right side, enclosing it in `"..."` should fix it
+
+## Example3 Inverse Path
+
+GraphDB Connectors support inverse property paths, although it is not documented ([GDB-14169](https://graphwise.atlassian.net/browse/GDB-14169)).
+
+Assume you want to make a field `siblings` with the names of siblings of a person. 
+But you only have the relation `hasChild`. Then you can define the field as follows:
+```yaml
+fields:
+  - fieldName: siblings
+    propertyChain: ^ex:hasChild/ex:hasChild/ex:name
+```
+
+Notice that the first property starts with `^`, which is the sigil for “inverse” in [SPARQL Property Paths](https://www.w3.org/TR/sparql11-query/#propertypaths) 
+
+Please note that:
+- If the database records both parents of each person, then it will return some sibling names twice (through the mother and the father).
+- It will return step-siblings too (people who share only one parent)
 
 ## Caveats
 
