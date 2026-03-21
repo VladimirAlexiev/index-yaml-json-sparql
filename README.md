@@ -36,7 +36,7 @@ The script [index-yaml-json-sparql.pl](index-yaml-json-sparql.pl) implements the
 - Expands prefixed RDF properties to full URLs using a file `prefixes.ttl`
 - In `types`: should be a text field of prefixed RDF type URLs, separated by comma or space
   - Wraps it in a JSON array
-- In `propertyChain`: should be a text field of prefixed property URLs, separated by `|` or `/`
+- In `propertyChain`: should be a text field of prefixed property URLs, optionally inverted `^`, separated by `|` (alternative) or `/` (sequence)
   - Converts sequential paths spelled with `/` to JSON arrays of URLs
   - Converts alternative paths spelled with `|` to suffixed property definitions
     (`prop$1, prop$2, prop$3 ...`)
@@ -489,7 +489,7 @@ Please note that:
 ## Caveats
 
 - You cannot use full URLs in `propertyChain` because that conflicts with the syntax `/` for sequential paths
-- Property paths can use only props, sequence `/` and alternative `|`. You cannot use parentheses
+- Property paths can use only props, inverse `^`, sequence `/` and alternative `|`. You cannot use parentheses
 - Do not specify a trailing slash in `elasticsearchNode` or you'll get error
   `Option 'elasticsearchNode': Couldn't connect to Elasticsearch at <server>! Name or service not known`
 - Use the `>-` YAML marker in `propertyChain` text to avoid stray newlines
